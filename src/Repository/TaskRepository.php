@@ -47,4 +47,47 @@ class TaskRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getDistinctComplexities()
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.complexity')
+            ->groupBy('t.complexity')
+            ->distinct()
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getDistinctProviders()
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.provider')
+            ->groupBy('t.provider')
+            ->distinct()
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getTasksByProviderNameAndComplexity($p_name,$complexity)
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.provider = :val')
+            ->setParameter('val', $p_name)
+            ->andWhere('t.complexity = :val2')
+            ->setParameter('val2', $complexity)
+            ->orderBy('t.complexity','ASC')
+            ->addOrderBy('t.duration','ASC')
+            ->getQuery()
+            ->execute();
+    }
+
+    public function getAvgTaskDurationByProviderName($value)
+    {
+        return $this->createQueryBuilder('t')
+            ->select('AVG(t.duration)')
+            ->andWhere('t.provider = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

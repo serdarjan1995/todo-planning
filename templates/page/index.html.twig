@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PageController!{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block javascripts %}
+
+{% endblock %}
+
+{% block body %}
+    <div>
+        <ul>
+            {% for provider in provider_tasks|keys %}
+                <h1>{{ provider }}</h1>
+                {% for developer_name in provider_tasks[provider]|keys %}
+                    <h3>{{ developer_name }}</h3>
+                    {% for job in provider_tasks[provider][developer_name]['jobs'] %}
+                        <li>{{ job.name|e }}</li>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
