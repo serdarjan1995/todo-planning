@@ -3,25 +3,178 @@
 {% block title %}Hello PageController!{% endblock %}
 
 {% block stylesheets %}
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 {% endblock %}
 
 {% block javascripts %}
-
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
 {% endblock %}
 
 {% block body %}
+   <style>
+        .wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
+        body {
+            margin: 40px 10px;
+            padding: 0;
+            font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+        .table td {
+            font-size: 12px;
+        }
+        .fontsize12 {
+            font-size: 12px;
+        }
+
+        .cell-style{
+            border: 1px solid black;
+            background: #5eb5e0;
+            display: table-cell;
+            height: 50px
+        }
+        .cell-style2{
+            border: 1px solid darkgreen;
+            display: table-cell;
+            height: 20px;
+            min-width: 20px;
+        }
+    </style>
+    {% set values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']%}
+    <div class="wrapper">
+        {% for i in 1..45 %}
+            <div class="cell-style2 fontsize12" style="width: 20px">{{ i }}</div>
+        {% endfor %}
+        <p>Each cell is one amount of time (in our case hours, 45 hours a week)</p>
+    </div>
     <div>
-        <ul>
-            {% for provider in provider_tasks|keys %}
-                <h1>{{ provider }}</h1>
-                {% for developer_name in provider_tasks[provider]|keys %}
-                    <h3>{{ developer_name }}</h3>
-                    {% for job in provider_tasks[provider][developer_name]['jobs'] %}
-                        <li>{{ job.name|e }}</li>
+        <div class="wrapper">
+
+            {% if is_providers_split %}
+                {% for provider in tasks|keys %}
+                    {{ provider }}
+                    {% for week in tasks[provider]|keys %}
+                        <span>Developers</span>
+                        <span style="margin-left: 100px">Schedule</span>
+                        <span><b>{{ week }}</b></span>
+                        {% for developer_name in tasks[provider][week]|keys %}
+                            <div>
+                                <span><b>{{ developer_name }}</b></span>
+
+                                {% for job in tasks[provider][week][developer_name]['jobs'] %}
+                                    {% set color = random(values)~ random(values)~ random(values)~ random(values)~ random(values)~ random(values)  %}
+                                    {% for i in 1..job.duration %}
+                                        <div class="cell-style2" style="background-color: #{{color}}" data-toggle="tooltip" data-placement="top" title="{{ job.name}} | Duration {{ job.duration }} | Complexity {{ job.complexity }}"></div>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <br/>
+                        <br/>
                     {% endfor %}
                 {% endfor %}
+
+            {% else %}
+                {% for week in tasks|keys %}
+                    <span>Developers</span>
+                    <span style="margin-left: 100px">Schedule</span>
+                    <span><b>{{ week }}</b></span>
+                    {% for developer_name in tasks[week]|keys %}
+                        <div>
+                            <span><b>{{ developer_name }}</b></span>
+
+                            {% for job in tasks[week][developer_name]['jobs'] %}
+                                {% set color = random(values)~ random(values)~ random(values)~ random(values)~ random(values)~ random(values)  %}
+                                {% for i in 1..job.duration %}
+                                    <div class="cell-style2" style="background-color: #{{color}}" data-toggle="tooltip" data-placement="top" title="{{ job.name}} | Duration {{ job.duration }} | Complexity {{ job.complexity }}"></div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <br/>
+                    <br/>
+                {% endfor %}
+            {% endif %}
+
+
+
+        </div>
+
+    <ul>
+        {% if is_providers_split %}
+            {% for provider in tasks|keys %}
+                <h1>{{ provider }}</h1>
+                {% for week in tasks[provider]|keys %}
+                    <h2>{{ week }}</h2>
+                    {% for developer_name in tasks[provider][week]|keys %}
+                        <div>
+                            <span><b>{{ developer_name }}</b></span>
+
+                            {% for job in tasks[provider][week][developer_name]['jobs'] %}
+                                <li>{{ job.name }} ----- Complexity:{{ job.complexity }} ----- Duration:{{ job.duration }}</li>
+
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <br/>
+                    <br/>
+                {% endfor %}
             {% endfor %}
-        </ul>
+            {% else %}
+                {% for week in tasks|keys %}
+                    <h1>{{ week }}</h1>
+                    {% for developer_name in tasks[week]|keys %}
+                        <div>
+                            <span><b>{{ developer_name }}</b></span>
+
+                            {% for job in tasks[week][developer_name]['jobs'] %}
+                                <li>{{ job.name }} ----- Complexity:{{ job.complexity }} ----- Duration:{{ job.duration }}</li>
+
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <br/>
+                    <br/>
+                {% endfor %}
+        {% endif %}
+    </ul>
+
+
+    <div class="wrapper">
+        <h3>Algorithm implementation</h3>
+        <pre>
+        1)Fetch all tasks and assign them to developers by complexity
+        2)Sort tasks by their durations in ascending order, so that the longest duration will be last
+        3)Sum task durations and group by complexity
+        4)Calculate average duration for all tasks
+        5)Iterate steps below until AVG(durations)>=(max(duration_by_complexity) - min(duration_by_complexity)) and lets say max 40 retries
+            a)Get last task from overloaded worker
+            b)Put that task to least overloaded worker in such way that new rounded duration will be task_duration*task_complexity/worker_level
+            c)
+        For Provider1:
+                Complexity 1    Complexity 2    Complexity 3    Complexity 4    Complexity 5
+                127             82              119             108             67
+                - 12                                                            + 12*1/5
+                103             82              119             108             70 (ceil rounded)
+                                                - 11                            + 11*3/5
+                103             82              108             108             80
+                                                                - 12            + 12*4/5
+                103             82              108             96              90
+                                + 11*3/2        - 11
+                103             99              97              96              90
+                - 11                                                            + 11*1/5
+                _________________________________________________________________________
+                92              99              97              96              93       -> stop because (99-92) < 8
+
+
+        </pre>
     </div>
+
+
 {% endblock %}
